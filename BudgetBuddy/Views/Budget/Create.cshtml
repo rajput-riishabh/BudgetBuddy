@@ -1,0 +1,172 @@
+﻿@model BudgetBuddy.Models.ViewModels.BudgetViewModel
+@{
+    ViewData["Title"] = "Set Budget";
+    var today = DateTime.Parse("2025-03-11");
+    var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="card-title mb-0">Set New Budget</h2>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+
+                    <form asp-action="Create" method="post" id="budgetForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Budget Period -->
+                        <div class="mb-4">
+                            <label class="form-label required">Budget Period</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="periodType" id="currentMonth" value="current" checked>
+                                <label class="btn btn-outline-primary" for="currentMonth">Current Month</label>
+
+                                <input type="radio" class="btn-check" name="periodType" id="nextMonth" value="next">
+                                <label class="btn btn-outline-primary" for="nextMonth">Next Month</label>
+
+                                <input type="radio" class="btn-check" name="periodType" id="custom" value="custom">
+                                <label class="btn btn-outline-primary" for="custom">Custom Period</label>
+                            </div>
+                        </div>
+
+                        <!-- Date Range -->
+                        <div class="row mb-4" id="dateRangeFields" style="display: none;">
+                            <div class="col-md-6">
+                                <label asp-for="StartDate" class="form-label required">Start Date</label>
+                                <input asp-for="StartDate" class="form-control" type="date" required
+                                       value="@firstDayOfMonth.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="StartDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="EndDate" class="form-label required">End Date</label>
+                                <input asp-for="EndDate" class="form-control" type="date" required
+                                       value="@lastDayOfMonth.ToString("yyyy-MM-dd")" />
+                                <span asp-validation-for="EndDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Category Selection -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CategoryId" class="form-label required">Category</label>
+                                <select asp-for="CategoryId" class="form-select" required>
+                                    <option value="">Select a category</option>
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <option value="@category.CategoryId">@category.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+
+                            <!-- Budget Amount -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Amount" class="form-label required">Budget Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01" required />
+                                </div>
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Set Budget
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .required:after {
+            content: " *";
+            color: red;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            const dateRangeFields = $('#dateRangeFields');
+            const startDateInput = $('#StartDate');
+            const endDateInput = $('#EndDate');
+
+            // Handle period type selection
+            $('input[name="periodType"]').change(function() {
+                const selectedValue = $(this).val();
+                const today = new Date('2025-03-11');
+
+                if (selectedValue === 'current') {
+                    dateRangeFields.hide();
+                    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    startDateInput.val(formatDate(firstDay));
+                    endDateInput.val(formatDate(lastDay));
+                }
+                else if (selectedValue === 'next') {
+                    dateRangeFields.hide();
+                    const firstDay = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                    const lastDay = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+                    startDateInput.val(formatDate(firstDay));
+                    endDateInput.val(formatDate(lastDay));
+                }
+                else {
+                    dateRangeFields.show();
+                }
+            });
+
+            // Format date to YYYY-MM-DD
+            function formatDate(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // Validate date range
+            $('#budgetForm').submit(function(e) {
+                const startDate = new Date(startDateInput.val());
+                const endDate = new Date(endDateInput.val());
+
+                if (startDate > endDate) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Invalid Date Range',
+                        text: 'End date must be after start date',
+                        icon: 'error',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+            });
+
+            // Amount validation
+            $('#Amount').on('input', function() {
+                const amount = parseFloat($(this).val());
+                if (amount <= 0) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
+}

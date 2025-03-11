@@ -1,0 +1,297 @@
+﻿@model BudgetBuddy.Models.ViewModels.MonthlyTrendViewModel
+@{
+    ViewData["Title"] = "Monthly Spending Trends";
+    var currentUser = "rajput-riishabh";
+    var currentDate = DateTime.Parse("2025-03-11 12:34:17");
+}
+
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Monthly Spending Trends</h2>
+            <p class="text-muted mb-0">
+                <i class="bi bi-calendar-range"></i>
+                @Model.StartDate.ToString("MMM yyyy") - @Model.EndDate.ToString("MMM yyyy")
+            </p>
+        </div>
+        <div class="btn-group">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-clock-history"></i> Time Range: @Model.Months Months
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item @(Model.Months == 3 ? "active" : "")"
+                           href="@Url.Action("MonthlyTrends", new { months = 3 })">Last 3 Months</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item @(Model.Months == 6 ? "active" : "")"
+                           href="@Url.Action("MonthlyTrends", new { months = 6 })">Last 6 Months</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item @(Model.Months == 12 ? "active" : "")"
+                           href="@Url.Action("MonthlyTrends", new { months = 12 })">Last 12 Months</a>
+                    </li>
+                </ul>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-table"></i> View Detailed Report
+            </a>
+        </div>
+    </div>
+
+    <!-- Overall Trend Chart -->
+    <div class="card bg-white shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Overall Spending Trend</h5>
+            <canvas id="overallTrendChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Category Distribution -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-white shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Category Distribution</h5>
+                    <canvas id="categoryDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Average by Category -->
+        <div class="col-md-8 mb-4">
+            <div class="card bg-white shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Monthly Average by Category</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Average</th>
+                                    <th>Minimum</th>
+                                    <th>Maximum</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var category in Model.MonthlyData)
+                                {
+                                    var amounts = category.MonthlyAmounts.Values;
+                                    var average = amounts.Average();
+                                    var min = amounts.Min();
+                                    var max = amounts.Max();
+                                    var total = amounts.Sum();
+
+                                    <tr>
+                                        <td>
+                                            @category.CategoryName
+                                            @if (Model.Categories.First(c => c.CategoryId == category.CategoryId).IsPredefined)
+                                            {
+                                                <span class="badge bg-info ms-2">System</span>
+                                            }
+                                        </td>
+                                        <td>@average.ToString("C")</td>
+                                        <td>@min.ToString("C")</td>
+                                        <td>@max.ToString("C")</td>
+                                        <td>@total.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category-wise Trends -->
+    <div class="card bg-white shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Category-wise Trends</h5>
+                <select id="categorySelector" class="form-select" style="width: auto;">
+                    <option value="all">All Categories</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.CategoryId">@category.Name</option>
+                    }
+                </select>
+            </div>
+            <canvas id="categoryTrendChart" height="100"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const monthLabels = @Json.Serialize(
+        Model.MonthlyData.FirstOrDefault()?.MonthlyAmounts.Keys
+            .OrderBy(d => d)
+            .Select(d => d.ToString("MMM yyyy")) ?? new string[0]
+    );
+
+        const categoryData = @Json.Serialize(Model.MonthlyData);
+        const allCategories = @Json.Serialize(Model.Categories);
+
+        // Overall Trend Chart
+        const overallCtx = document.getElementById('overallTrendChart').getContext('2d');
+        const overallData = monthLabels.map(month =>
+            categoryData.reduce((sum, category) => {
+                const monthData = category.MonthlyAmounts[month] || 0;
+                return sum + monthData;
+            }, 0)
+        );
+
+        new Chart(overallCtx, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Total Monthly Expenses',
+                    data: overallData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: true,
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '$' + value.toFixed(2)
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: context => '$' + context.raw.toFixed(2)
+                        }
+                    }
+                }
+            }
+        });
+
+        // Category Distribution Chart
+        const distributionCtx = document.getElementById('categoryDistributionChart').getContext('2d');
+        const categoryTotals = categoryData.map(category => ({
+            name: category.CategoryName,
+            total: Object.values(category.MonthlyAmounts).reduce((a, b) => a + b, 0)
+        }));
+
+        new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryTotals.map(c => c.name),
+                datasets: [{
+                    data: categoryTotals.map(c => c.total),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: context => {
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${context.label}: $${value.toFixed(2)} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Category Trend Chart
+        let categoryTrendChart;
+
+        function updateCategoryTrendChart(selectedCategoryId) {
+            const ctx = document.getElementById('categoryTrendChart').getContext('2d');
+
+            if (categoryTrendChart) {
+                categoryTrendChart.destroy();
+            }
+
+            const datasets = [];
+            if (selectedCategoryId === 'all') {
+                categoryData.forEach((category, index) => {
+                    datasets.push({
+                        label: category.CategoryName,
+                        data: monthLabels.map(month => category.MonthlyAmounts[month] || 0),
+                        borderColor: `hsl(${index * (360 / categoryData.length)}, 70%, 50%)`,
+                        tension: 0.1
+                    });
+                });
+            } else {
+                const category = categoryData.find(c => c.CategoryId === parseInt(selectedCategoryId));
+                if (category) {
+                    datasets.push({
+                        label: category.CategoryName,
+                        data: monthLabels.map(month => category.MonthlyAmounts[month] || 0),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: true,
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)'
+                    });
+                }
+            }
+
+            categoryTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: monthLabels, datasets },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: value => '$' + value.toFixed(2)
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: context =>
+                                    `${context.dataset.label}: $${context.raw.toFixed(2)}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize with all categories
+        updateCategoryTrendChart('all');
+
+        // Handle category selection change
+        document.getElementById('categorySelector').addEventListener('change', function(e) {
+            updateCategoryTrendChart(e.target.value);
+        });
+    </script>
+}

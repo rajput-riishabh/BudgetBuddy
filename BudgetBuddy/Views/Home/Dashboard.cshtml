@@ -1,0 +1,230 @@
+﻿using System.Security.Claims;
+@model BudgetBuddy.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var currentDate = DateTime.UtcNow;
+    var currentMonth = currentDate.ToString("MMMM yyyy");
+}
+
+<div class="container-fluid">
+    <!-- Welcome and Date Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Welcome, @User.FindFirst(ClaimTypes.GivenName)?.Value!</h2>
+        <div class="text-muted">
+            <i class="bi bi-calendar3"></i> @currentMonth
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Budget</h6>
+                            <h2 class="card-text text-primary mb-0">@Model.TotalBudget.ToString("C")</h2>
+                        </div>
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                            <i class="bi bi-wallet2 text-primary fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Total Expenses</h6>
+                            <h2 class="card-text text-danger mb-0">@Model.TotalExpenses.ToString("C")</h2>
+                        </div>
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3">
+                            <i class="bi bi-credit-card text-danger fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-2 text-muted">Remaining Budget</h6>
+                            <h2 class="card-text @(Model.RemainingBudget < 0 ? "text-danger" : "text-success") mb-0">
+                                @Model.RemainingBudget.ToString("C")
+                            </h2>
+                        </div>
+                        <div class="rounded-circle bg-@(Model.RemainingBudget < 0 ? "danger" : "success") bg-opacity-10 p-3">
+                            <i class="bi bi-piggy-bank text-@(Model.RemainingBudget < 0 ? "danger" : "success") fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Monthly Trend Chart -->
+        <div class="col-md-8 mb-4">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Monthly Expense Trend</h5>
+                    <canvas id="monthlyTrendChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Distribution Chart -->
+        <div class="col-md-4 mb-4">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Expense Distribution</h5>
+                    <canvas id="categoryDistributionChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Status -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Budget Status</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Budget</th>
+                                    <th>Spent</th>
+                                    <th>Remaining</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var status in Model.BudgetStatuses)
+                                {
+                                    var percentage = status.BudgetAmount == 0 ? 0 : (status.SpentAmount / status.BudgetAmount) * 100;
+                                    var progressClass = percentage switch
+                                    {
+                                        >= 100 => "danger",
+                                        >= 75 => "warning",
+                                        _ => "success"
+                                    };
+
+                                    <tr>
+                                        <td>@status.CategoryName</td>
+                                        <td>@status.BudgetAmount.ToString("C")</td>
+                                        <td>@status.SpentAmount.ToString("C")</td>
+                                        <td>@status.RemainingAmount.ToString("C")</td>
+                                        <td style="width: 20%">
+                                            <div class="progress">
+                                                <div class="progress-bar bg-@progressClass"
+                                                     role="progressbar"
+                                                     style="width: @(Math.Min(percentage, 100))%"
+                                                     aria-valuenow="@percentage"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                    @percentage.ToString("F0")%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if (status.IsExceeded)
+                                            {
+                                                <span class="badge bg-danger">Exceeded</span>
+                                            }
+                                            else if (percentage >= 75)
+                                            {
+                                                <span class="badge bg-warning text-dark">Warning</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">On Track</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Monthly Trend Chart
+        const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
+        new Chart(monthlyTrendCtx, {
+            type: 'line',
+            data: {
+                labels: @Json.Serialize(Model.MonthlyExpenses.Select(m => m.Month)),
+                datasets: [{
+                    label: 'Monthly Expenses',
+                    data: @Json.Serialize(Model.MonthlyExpenses.Select(m => m.Amount)),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Category Distribution Chart
+        const categoryDistributionCtx = document.getElementById('categoryDistributionChart').getContext('2d');
+        new Chart(categoryDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: @Json.Serialize(Model.CategoryExpenses.Select(c => c.CategoryName)),
+                datasets: [{
+                    data: @Json.Serialize(Model.CategoryExpenses.Select(c => c.Amount)),
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#FF9F40',
+                        '#FF6384',
+                        '#36A2EB'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,175 @@
+﻿@model BudgetBuddy.Models.ViewModels.CategoryViewModel
+@{
+    ViewData["Title"] = "Add Category";
+    var isAdmin = User.IsInRole("Admin");
+    var currentUser = "rajput-riishabh";
+    var currentDate = DateTime.Parse("2025-03-11 12:14:37");
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card bg-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="card-title mb-1">Add New Category</h2>
+                            <p class="text-muted mb-0">
+                                @if (isAdmin)
+                                {
+                                    <span>Creating as Administrator</span>
+                                }
+                                else
+                                {
+                                    <span>Creating as @currentUser</span>
+                                }
+                            </p>
+                        </div>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+
+                    <form asp-action="Create" method="post" id="createCategoryForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <!-- Category Type Selection (Admin Only) -->
+                        @if (isAdmin)
+                        {
+                            <div class="mb-4">
+                                <label class="form-label">Category Type</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="categoryType" id="customCategory"
+                                           value="custom" checked asp-for="IsPredefined">
+                                    <label class="btn btn-outline-primary" for="customCategory">
+                                        <i class="bi bi-person"></i> Custom Category
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="categoryType" id="systemCategory"
+                                           value="system" asp-for="IsPredefined">
+                                    <label class="btn btn-outline-info" for="systemCategory">
+                                        <i class="bi bi-gear"></i> System Category
+                                    </label>
+                                </div>
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i>
+                                    System categories are available to all users and can only be managed by administrators.
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Category Name -->
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label required">Category Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-tag"></i>
+                                </span>
+                                <input asp-for="Name" class="form-control" placeholder="Enter category name"
+                                       maxlength="50" required />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <div class="form-text">
+                                <span id="nameCharCount">0</span>/50 characters
+                            </div>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i>
+                                Use a clear, descriptive name. Only letters, numbers, spaces, & and - are allowed.
+                            </div>
+                        </div>
+
+                        <!-- Creation Info -->
+                        <div class="mb-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Creation Details</h6>
+                                    <p class="card-text mb-0">
+                                        <small>
+                                            <i class="bi bi-person"></i> Created by: @currentUser
+                                        </small>
+                                    </p>
+                                    <p class="card-text mb-0">
+                                        <small>
+                                            <i class="bi bi-calendar"></i> Creation date: @currentDate.ToString("yyyy-MM-dd HH:mm:ss")
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Create Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .required:after {
+            content: " *";
+            color: red;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            const nameInput = document.querySelector('#Name');
+            const charCount = document.querySelector('#nameCharCount');
+            const form = document.querySelector('#createCategoryForm');
+
+            // Character counter
+            function updateCharCount() {
+                const currentLength = nameInput.value.length;
+                charCount.textContent = currentLength;
+
+                if (currentLength >= 45) {
+                    charCount.classList.add('text-danger');
+                } else {
+                    charCount.classList.remove('text-danger');
+                }
+            }
+
+            // Update on input
+            nameInput.addEventListener('input', function(e) {
+                updateCharCount();
+
+                // Validate input characters
+                const regex = /^[a-zA-Z0-9\s&-]*$/;
+                if (!regex.test(e.target.value)) {
+                    e.target.classList.add('is-invalid');
+                } else {
+                    e.target.classList.remove('is-invalid');
+                }
+            });
+
+            // Initial count
+            updateCharCount();
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                if (nameInput.value.trim().length < 2) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Validation Error',
+                        text: 'Category name must be at least 2 characters long',
+                        icon: 'error',
+                        confirmButtonColor: '#3085d6'
+                    });
+                }
+            });
+        });
+    </script>
+}

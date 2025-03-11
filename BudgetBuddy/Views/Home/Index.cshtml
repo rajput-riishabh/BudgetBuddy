@@ -1,0 +1,55 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+
+<div class="container">
+    <div class="row align-items-center min-vh-75">
+        <div class="col-md-6">
+            <h1 class="display-4 mb-4">Welcome to BudgetBuddy</h1>
+            <p class="lead mb-4">
+                Take control of your finances with our easy-to-use budget tracking system.
+                Monitor expenses, set budgets, and achieve your financial goals.
+            </p>
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <div class="d-grid gap-2 d-md-flex">
+                    <a asp-controller="Auth" asp-action="Register" class="btn btn-primary btn-lg me-md-2">Get Started</a>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-primary btn-lg">Login</a>
+                </div>
+            }
+        </div>
+        <div class="col-md-6">
+            <img src="~/images/budget-illustration.svg" alt="Budget Management Illustration" class="img-fluid" />
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up text-primary display-4"></i>
+                    <h3 class="card-title mt-3">Track Expenses</h3>
+                    <p class="card-text">Monitor your spending habits and categorize expenses easily.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-wallet2 text-primary display-4"></i>
+                    <h3 class="card-title mt-3">Set Budgets</h3>
+                    <p class="card-text">Create and manage budgets for different expense categories.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-bar-chart text-primary display-4"></i>
+                    <h3 class="card-title mt-3">View Reports</h3>
+                    <p class="card-text">Get insights into your spending with detailed reports and charts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

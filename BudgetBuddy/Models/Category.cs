@@ -14,7 +14,7 @@ namespace BudgetBuddy.Models
         public string Name { get; set; }
 
         [StringLength(200)]
-        public string? Description { get; set; }
+        public string Description { get; set; }
 
         // Auditing Properties
         public int CreatedBy { get; set; }

@@ -22,9 +22,9 @@ namespace BudgetBuddy.Models.ViewModels
 
         [Phone]
         [Display(Name = "Phone Number")]
-        public string? PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
 
-        public string? ProfilePicture { get; set; }
+        public string ProfilePicture { get; set; }
 
         [Display(Name = "Preferred Currency")]
         public string PreferredCurrency { get; set; }

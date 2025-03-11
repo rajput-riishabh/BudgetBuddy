@@ -4,15 +4,26 @@ using BudgetBuddy.Models.Enums;
 
 namespace BudgetBuddy.Models.ViewModels
 {
-    public class ReportViewModels
+    public class ReportIndexViewModel
     {
-        public ExpenseReportViewModel ExpenseReport { get; set; }
-        public BudgetReportViewModel BudgetReport { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public decimal TotalExpenses { get; set; }
+        public decimal TotalBudget { get; set; }
+        public int ExpenseCount { get; set; }
+        public int CategoryCount { get; set; }
+        public List<CategoryReportViewModel> CategoryExpenses { get; set; }
+        public List<DailyExpenseViewModel> DailyExpenses { get; set; }
 
-        public ReportViewModels()
+        public decimal RemainingBudget => TotalBudget - TotalExpenses;
+        public double BudgetUsagePercentage => TotalBudget == 0 ? 0 : (double)((TotalExpenses / TotalBudget) * 100);
+
+        public ReportIndexViewModel()
         {
-            ExpenseReport = new ExpenseReportViewModel();
-            BudgetReport = new BudgetReportViewModel();
+            CategoryExpenses = new List<CategoryReportViewModel>();
+            DailyExpenses = new List<DailyExpenseViewModel>();
+            StartDate = DateTime.Parse("2025-03-11 18:25:45").AddMonths(-1);
+            EndDate = DateTime.Parse("2025-03-11 18:25:45");
         }
     }
 
@@ -25,8 +36,8 @@ namespace BudgetBuddy.Models.ViewModels
 
         public ExpenseReportViewModel()
         {
-            StartDate = DateTime.Parse("2025-03-11 17:16:28").AddMonths(-1);
-            EndDate = DateTime.Parse("2025-03-11 17:16:28");
+            StartDate = DateTime.Parse("2025-03-11 18:25:45").AddMonths(-1);
+            EndDate = DateTime.Parse("2025-03-11 18:25:45");
             Items = new List<ExpenseReportItem>();
         }
     }
@@ -37,6 +48,11 @@ namespace BudgetBuddy.Models.ViewModels
         public decimal Amount { get; set; }
         public decimal Percentage { get; set; }
         public int Count { get; set; }
+
+        public ExpenseReportItem()
+        {
+            CategoryName = string.Empty;
+        }
     }
 
     public class BudgetReportViewModel
@@ -60,6 +76,36 @@ namespace BudgetBuddy.Models.ViewModels
         public decimal RemainingAmount => BudgetAmount - SpentAmount;
         public decimal Percentage => BudgetAmount == 0 ? 0 : (SpentAmount / BudgetAmount) * 100;
         public BudgetStatus Status { get; set; }
+
+        public BudgetReportItem()
+        {
+            CategoryName = string.Empty;
+        }
+    }
+
+    public class CategoryReportViewModel
+    {
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+        public bool IsPredefined { get; set; }
+        public int ExpenseCount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal BudgetAmount { get; set; }
+
+        public decimal RemainingBudget => BudgetAmount - TotalAmount;
+        public double BudgetUsagePercentage => BudgetAmount == 0 ? 0 : (double)((TotalAmount / BudgetAmount) * 100);
+
+        public CategoryReportViewModel()
+        {
+            CategoryName = string.Empty;
+        }
+    }
+
+    public class DailyExpenseViewModel
+    {
+        public DateTime Date { get; set; }
+        public decimal TotalAmount { get; set; }
+        public int ExpenseCount { get; set; }
     }
 
     public class CategoryReportDetailViewModel
@@ -81,8 +127,8 @@ namespace BudgetBuddy.Models.ViewModels
         {
             CategoryName = string.Empty;
             Expenses = new List<ExpenseViewModel>();
-            StartDate = DateTime.Parse("2025-03-11 18:11:04").AddMonths(-1);
-            EndDate = DateTime.Parse("2025-03-11 18:11:04");
+            StartDate = DateTime.Parse("2025-03-11 18:25:45").AddMonths(-1);
+            EndDate = DateTime.Parse("2025-03-11 18:25:45");
         }
     }
 

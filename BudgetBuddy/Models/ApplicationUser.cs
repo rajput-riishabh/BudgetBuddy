@@ -7,7 +7,7 @@ namespace BudgetBuddy.Models
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string? ProfilePicture { get; set; }
+        public string ProfilePicture { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Parse("2025-03-11 15:43:11");
         public DateTime? LastLoginAt { get; set; }
         public bool IsActive { get; set; } = true;

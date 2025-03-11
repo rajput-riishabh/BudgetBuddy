@@ -1,4 +1,5 @@
 ﻿@model BudgetBuddy.Models.ViewModels.ExpenseViewModel
+
 @{
     ViewData["Title"] = "Edit Expense";
 }
@@ -46,8 +47,8 @@
                                 <option value="">Select a category</option>
                                 @foreach (var category in Model.Categories)
                                 {
-                                    <option value="@category.CategoryId" 
-                                            @(category.CategoryId == Model.CategoryId ? "selected" : "")>
+                                    <option value="@category.CategoryId"
+                                            selected="@(category.CategoryId == Model.CategoryId)">
                                         @category.Name
                                     </option>
                                 }

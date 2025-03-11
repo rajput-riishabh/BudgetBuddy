@@ -89,7 +89,7 @@
                                        placeholder="Enter category name"
                                        maxlength="50" 
                                        required
-                                       @((!isAdmin && Model.IsPredefined) ? "readonly" : "") />
+                                       readonly="@(!isAdmin && Model.IsPredefined)" />
                             </div>
                             <span asp-validation-for="Name" class="text-danger"></span>
                             <div class="form-text">

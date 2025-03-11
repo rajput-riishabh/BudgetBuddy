@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BudgetBuddy.Models.ViewModels
 {
@@ -16,5 +17,7 @@ namespace BudgetBuddy.Models.ViewModels
         public decimal TotalExpenses { get; set; }
         public bool CanEdit { get; set; }
         public bool CanDelete { get; set; }
+        public DateTime LastModified { get; set; }
+        public string LastModifiedBy { get; set; }
     }
 }

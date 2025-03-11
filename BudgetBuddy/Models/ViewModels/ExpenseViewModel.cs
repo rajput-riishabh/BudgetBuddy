@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace BudgetBuddy.Models.ViewModels
 {
@@ -11,7 +13,7 @@ namespace BudgetBuddy.Models.ViewModels
         public int CategoryId { get; set; }
 
         [Required(ErrorMessage = "Amount is required")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
+        [Range(1, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
         [DataType(DataType.Currency)]
         [Display(Name = "Amount")]
         public decimal Amount { get; set; }
@@ -25,8 +27,13 @@ namespace BudgetBuddy.Models.ViewModels
         [DataType(DataType.Date)]
         [Display(Name = "Date")]
         public DateTime Date { get; set; }
-
         // Navigation property for categories dropdown
-        public IEnumerable<Category> Categories { get; set; } = new List<Category>();
+        public IEnumerable<CategoryViewModel> Categories { get; set; }
+
+        public ExpenseViewModel()
+        {
+            Date = DateTime.Today;
+            Categories = new List<CategoryViewModel>();
+        }
     }
 }

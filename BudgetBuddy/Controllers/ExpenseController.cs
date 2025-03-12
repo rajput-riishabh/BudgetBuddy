@@ -78,9 +78,17 @@ namespace BudgetBuddy.Controllers
             {
                 Date = DateTime.UtcNow,
                 Categories = categories
+                    .Select(c => new CategoryViewModel
+                    {
+                        CategoryId = c.CategoryId,
+                        Name = c.Name,
+                        IsPredefined = c.IsPredefined // Include IsPredefined mapping
+                    })
+                    .ToList()
             };
             return View(viewModel);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -128,7 +136,14 @@ namespace BudgetBuddy.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            viewModel.Categories = await _context.Categories.ToListAsync();
+            viewModel.Categories = await _context.Categories
+                .Select(c => new CategoryViewModel
+                {
+                    CategoryId = c.CategoryId,
+                    Name = c.Name,
+                    IsPredefined = c.IsPredefined // Include IsPredefined mapping
+                })
+                .ToListAsync();
             return View(viewModel);
         }
 
@@ -155,7 +170,14 @@ namespace BudgetBuddy.Controllers
                 Amount = expense.Amount,
                 Description = expense.Description,
                 Date = expense.Date,
-                Categories = await _context.Categories.ToListAsync()
+                Categories = _context.Categories
+                   .Select(c => new CategoryViewModel
+                   {
+                       CategoryId = c.CategoryId,
+                       Name = c.Name,
+                       IsPredefined = c.IsPredefined // Include IsPredefined mapping
+                   })
+                   .ToList()
             };
 
             return View(viewModel);
@@ -205,9 +227,17 @@ namespace BudgetBuddy.Controllers
                 }
             }
 
-            viewModel.Categories = await _context.Categories.ToListAsync();
+            viewModel.Categories = await _context.Categories
+                 .Select(c => new CategoryViewModel
+                 {
+                     CategoryId = c.CategoryId,
+                     Name = c.Name,
+                     IsPredefined = c.IsPredefined // Include IsPredefined mapping
+                 })
+                 .ToListAsync();
             return View(viewModel);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

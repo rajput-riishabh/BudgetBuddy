@@ -134,12 +134,12 @@ namespace BudgetBuddy.Models.ViewModels
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
-        public Dictionary<string, decimal> MonthlyAmounts { get; set; }
+        public Dictionary<DateTime, decimal> MonthlyAmounts { get; set; }
 
         public CategoryTrendViewModel()
         {
             CategoryName = string.Empty;
-            MonthlyAmounts = new Dictionary<string, decimal>();
+            MonthlyAmounts = new Dictionary<DateTime, decimal>();
         }
     }
 

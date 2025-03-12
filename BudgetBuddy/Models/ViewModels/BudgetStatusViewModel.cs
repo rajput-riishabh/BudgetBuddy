@@ -14,11 +14,4 @@
         public double PercentageUsed => BudgetAmount == 0 ? 0 : (double)((SpentAmount / BudgetAmount) * 100);
         public bool IsExceeded => SpentAmount > BudgetAmount;
     }
-    public enum BudgetStatus
-    {
-        UnderBudget,
-        NearLimit,
-        OverBudget,
-        NoBudget
-    }
 }

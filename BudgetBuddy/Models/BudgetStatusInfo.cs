@@ -1,5 +1,4 @@
 ﻿using BudgetBuddy.Models.Enums;
-
 namespace BudgetBuddy.Models
 {
     public class BudgetStatusInfo

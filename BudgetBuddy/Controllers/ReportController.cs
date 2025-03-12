@@ -203,14 +203,22 @@ namespace BudgetBuddy.Controllers
                 Months = months,
                 StartDate = startDate,
                 EndDate = currentDate,
-                Categories = await _context.Categories.ToListAsync(),
+                Categories = await _context.Categories // Corrected: Map Category to CategoryViewModel
+                                .Select(c => new CategoryViewModel // Projection to CategoryViewModel
+                                {
+                                    CategoryId = c.CategoryId,
+                                    Name = c.Name,
+                                    IsPredefined = _predefinedCategoryIds.Contains(c.CategoryId),
+                                    // Add other mappings if needed, like ExpenseCount, TotalExpenses, etc., if you intend to use them in the MonthlyTrends view.
+                                })
+                                .ToListAsync(),
                 MonthlyData = trends
                     .GroupBy(t => new { t.CategoryId, t.CategoryName })
                     .Select(g => new CategoryTrendViewModel
                     {
                         CategoryId = g.Key.CategoryId,
                         CategoryName = g.Key.CategoryName,
-                        MonthlyAmounts = g.ToDictionary(
+                        MonthlyAmounts = g.ToDictionary( // Corrected: DateTime key for MonthlyAmounts
                             x => new DateTime(x.Year, x.Month, 1),
                             x => x.Total
                         )

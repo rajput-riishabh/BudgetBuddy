@@ -5,6 +5,6 @@
         UnderBudget,
         NearLimit,
         OverBudget,
-        NoBudget
+        NoBudget,
     }
 }

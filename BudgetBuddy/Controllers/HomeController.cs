@@ -7,8 +7,8 @@ using System.Security.Claims;
 using System.Diagnostics;
 using System;
 using System.Linq;
-using BudgetBuddy.Models.Enums;
 using BudgetBuddy.Services;
+using BudgetBuddy.Models.Enums;
 
 namespace BudgetBuddy.Controllers
 {
@@ -52,16 +52,24 @@ namespace BudgetBuddy.Controllers
 
             // Get last 6 months expenses for trend
             var sixMonthsAgo = startOfMonth.AddMonths(-5);
-            var monthlyExpenses = await _context.Expenses
-                .Where(e => e.UserId == userId && e.Date >= sixMonthsAgo)
-                .GroupBy(e => new { e.Date.Year, e.Date.Month })
-                .Select(g => new DashboardViewModel.MonthlyExpenseSummary
-                {
-                    Month = $"{g.Key.Year}-{g.Key.Month:D2}",
-                    Amount = g.Sum(e => e.Amount)
-                })
-                .OrderBy(m => m.Month)
-                .ToListAsync();
+            var monthlyExpensesRaw = await _context.Expenses
+     .Where(e => e.UserId == userId && e.Date >= sixMonthsAgo)
+     .GroupBy(e => new { e.Date.Year, e.Date.Month })
+     .Select(g => new
+     {
+         Year = g.Key.Year,
+         Month = g.Key.Month,
+         Amount = g.Sum(e => e.Amount)
+     })
+     .OrderBy(m => m.Year) // Ensure proper chronological order
+     .ThenBy(m => m.Month)
+     .ToListAsync();
+
+            var monthlyExpenses = monthlyExpensesRaw.Select(m => new DashboardViewModel.MonthlyExpenseSummary
+            {
+                Month = $"{m.Year}-{m.Month:D2}", // Format the month string here, after data retrieval
+                Amount = m.Amount
+            }).ToList();
 
             var categoryExpenses = expenses
                 .GroupBy(e => e.Category)
@@ -75,7 +83,7 @@ namespace BudgetBuddy.Controllers
                 })
                 .ToList();
 
-            var budgetStatuses = budgets
+            var budgetStatusesList = budgets
                 .Select(b => new DashboardViewModel.BudgetStatusSummary
                 {
                     CategoryName = b.Category.Name,
@@ -92,6 +100,19 @@ namespace BudgetBuddy.Controllers
                 })
                 .ToList();
 
+            // Transform the list into a Dictionary<string, BudgetStatusInfo>
+    var budgetStatusesDictionary = budgetStatusesList.ToDictionary(
+        summary => summary.CategoryName, // Key is CategoryName (string)
+        summary => new BudgetStatusInfo // Value is a new BudgetStatusInfo object
+        {
+            CategoryName = summary.CategoryName,
+            BudgetAmount = summary.BudgetAmount,
+            SpentAmount = summary.SpentAmount,
+            // RemainingAmount is calculated property in BudgetStatusInfo, no need to set here
+            // IsExceeded is calculated property in BudgetStatusInfo, no need to set here
+            Status = (Models.BudgetStatus)(summary.IsExceeded ? BudgetBuddy.Models.Enums.BudgetStatus.OverBudget : BudgetBuddy.Models.Enums.BudgetStatus.UnderBudget)
+        });
+
             var dashboardViewModel = new DashboardViewModel
             {
                 TotalExpenses = expenses.Sum(e => e.Amount),
@@ -99,7 +120,7 @@ namespace BudgetBuddy.Controllers
                 RemainingBudget = budgets.Sum(b => b.Amount) - expenses.Sum(e => e.Amount),
                 CategoryExpenses = categoryExpenses,
                 MonthlyExpenses = monthlyExpenses,
-                BudgetStatuses = budgetStatuses
+                BudgetStatuses = budgetStatusesDictionary
             };
 
             return View(dashboardViewModel);

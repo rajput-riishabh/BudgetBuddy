@@ -15,6 +15,8 @@ using BudgetBuddy.Services;
 using System;
 using System.Linq;
 using BudgetBuddy.Models.Enums;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 
@@ -52,32 +54,50 @@ namespace BudgetBuddy.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(LoginDTO model)
+        public async Task<IActionResult> Login(LoginDTO model) // Make Login action async
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            var user = _context.Users.FirstOrDefault(u => u.UserName == model.UserName);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == model.UserName); // Use async version
             if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
             {
                 ModelState.AddModelError("", "Invalid username or password");
                 return View(model);
             }
 
-            var token = GenerateJwtToken(user);
-
-            HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+            // 1. Create Claims for the authenticated user (similar to what you did for JWT)
+            var claims = new List<Claim>
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(_jwtConfig.ExpirationInMinutes)
-            });
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.GivenName, user.FirstName),
+                new Claim(ClaimTypes.Surname, user.LastName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role),
+            };
+
+            // 2. Create ClaimsIdentity
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // 3. Perform SignInAsync to create and set the authentication cookie
+            var authProperties = new AuthenticationProperties
+            {
+                AllowRefresh = true, // Optional: Allow cookie to be refreshed
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1), // Set cookie expiration (match Program.cs config)
+                //IsPersistent = model.RememberMe // Optional: "Remember Me" functionality
+            };
+
+            await HttpContext.SignInAsync(
+                 "BudgetBuddyAuth",
+                     new ClaimsPrincipal(claimsIdentity),
+                  authProperties);
 
             user.LastLoginAt = DateTime.UtcNow;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync(); // Use async version
 
             return RedirectToAction("Dashboard", "Home");
         }

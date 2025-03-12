@@ -155,6 +155,7 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Monthly Trend Chart
         const monthlyTrendCtx = document.getElementById('monthlyTrendChart').getContext('2d');
@@ -172,7 +173,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 plugins: {
                     legend: {
                         position: 'top',
@@ -183,7 +184,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return '$' + value.toLocaleString();
+                                return '₹' + value.toLocaleString();
                             }
                         }
                     }
@@ -213,7 +214,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 plugins: {
                     legend: {
                         position: 'bottom'

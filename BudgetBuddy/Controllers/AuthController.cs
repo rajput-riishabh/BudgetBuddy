@@ -166,9 +166,9 @@ namespace BudgetBuddy.Controllers
         }
 
         [HttpPost]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout() // Make Logout action async
         {
-            HttpContext.Response.Cookies.Delete("AuthToken");
+            await HttpContext.SignOutAsync("BudgetBuddyAuth");
             return RedirectToAction("Index", "Home");
         }
 

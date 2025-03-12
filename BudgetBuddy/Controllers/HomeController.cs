@@ -76,7 +76,7 @@ namespace BudgetBuddy.Controllers
                 .ToList();
 
             var budgetStatuses = budgets
-                .Select(b => new DashboardViewModel.BudgetStatus
+                .Select(b => new DashboardViewModel.BudgetStatusSummary
                 {
                     CategoryName = b.Category.Name,
                     BudgetAmount = b.Amount,

@@ -19,6 +19,8 @@ namespace BudgetBuddy.Models.ViewModels
         public IEnumerable<MonthlyExpenseSummary> MonthlyTrend { get; set; }
         public Dictionary<string, BudgetStatusInfo> BudgetStatuses { get; set; }
 
+        public List<BudgetStatusInfo> BudgetStatuses { get; set; }
+
 
         // Budget Overview
         //public decimal MonthlyBudgetLimit { get; set; }
@@ -67,12 +69,12 @@ namespace BudgetBuddy.Models.ViewModels
     //    public string IconClass { get; set; }
     //}
 
-    //public class BudgetStatusSummary
-    //{
-    //    public string Category { get; set; }
-    //    public decimal CurrentAmount { get; set; }
-    //    public decimal BudgetLimit { get; set; }
-    //    public decimal PercentageUsed { get; set; }
-    //    public BudgetStatus Status { get; set; }
-    //}
+    public class BudgetStatusSummary
+    {
+        public string Category { get; set; }
+        public decimal CurrentAmount { get; set; }
+        public decimal BudgetLimit { get; set; }
+        public decimal PercentageUsed { get; set; }
+        public BudgetStatus Status { get; set; }
+    }
 }

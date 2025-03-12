@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using BudgetBuddy.Models.Enums;
 
 namespace BudgetBuddy.Models.ViewModels
@@ -88,9 +89,16 @@ namespace BudgetBuddy.Models.ViewModels
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
         public bool IsPredefined { get; set; }
+
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public decimal TotalExpenses { get; set; }
+
         public int ExpenseCount { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal BudgetAmount { get; set; }
+
+        public ICollection<ExpenseViewModel> Expenses { get; set; }
 
         public decimal RemainingBudget => BudgetAmount - TotalAmount;
         public decimal BudgetUsagePercentage => BudgetAmount == 0 ? 0 : (decimal)((TotalAmount / BudgetAmount) * 100);
@@ -98,6 +106,9 @@ namespace BudgetBuddy.Models.ViewModels
         public CategoryReportViewModel()
         {
             CategoryName = string.Empty;
+            StartDate = DateTime.ParseExact("2025-03-12 04:14:12", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture).AddMonths(-1);
+            EndDate = DateTime.ParseExact("2025-03-12 04:14:12", "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+            Expenses = new List<ExpenseViewModel>();
         }
     }
 

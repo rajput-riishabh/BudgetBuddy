@@ -49,7 +49,7 @@ namespace BudgetBuddy.Controllers
 
             var categories = await _context.Categories.ToListAsync();
 
-            var viewModel = new ReportViewModels
+            var viewModel = new ReportIndexViewModel
             {
                 StartDate = startDate.Value,
                 EndDate = endDate.Value,
@@ -119,7 +119,7 @@ namespace BudgetBuddy.Controllers
                                         b.StartDate <= endDate &&
                                         b.EndDate >= startDate);
 
-            var viewModel = new CategoryReportDetailViewModel
+            var viewModel = new CategoryReportViewModel
             {
                 CategoryId = category.CategoryId,
                 CategoryName = category.Name,

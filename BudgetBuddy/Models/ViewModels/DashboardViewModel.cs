@@ -19,7 +19,7 @@ namespace BudgetBuddy.Models.ViewModels
         public IEnumerable<MonthlyExpenseSummary> MonthlyTrend { get; set; }
         public Dictionary<string, BudgetStatusInfo> BudgetStatuses { get; set; }
 
-        public List<BudgetStatusInfo> BudgetStatuses { get; set; }
+        public List<BudgetStatusInfo> BudgetStatusesInfo { get; set; }
 
 
         // Budget Overview

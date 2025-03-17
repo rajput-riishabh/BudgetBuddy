@@ -11,10 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configure JWT
-var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>();
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
-
 // Add Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -47,7 +43,6 @@ if (!app.Environment.IsDevelopment())
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseRouting();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

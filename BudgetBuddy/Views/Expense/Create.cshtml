@@ -33,7 +33,7 @@
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Date" class="form-label required">Date</label>
                                 <input asp-for="Date" class="form-control" type="date"
-                                       value="@DateTime.UtcNow.ToString("yyyy-MM-dd")" required />
+                                       value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
                                 <span asp-validation-for="Date" class="text-danger"></span>
                             </div>
                         </div>

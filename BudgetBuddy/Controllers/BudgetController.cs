@@ -24,7 +24,7 @@ namespace BudgetBuddy.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var currentDate = DateTime.UtcNow;
+            var currentDate = DateTime.Now;
             var startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
@@ -73,8 +73,8 @@ namespace BudgetBuddy.Controllers
             var categories = await _context.Categories.ToListAsync();
             var viewModel = new BudgetViewModel
             {
-                StartDate = DateTime.UtcNow.Date,
-                EndDate = DateTime.UtcNow.Date.AddMonths(1).AddDays(-1),
+                StartDate = DateTime.Now.Date,
+                EndDate = DateTime.Now.Date.AddMonths(1).AddDays(-1),
                 Categories = categories
             };
             return View(viewModel);
@@ -242,7 +242,7 @@ namespace BudgetBuddy.Controllers
         public async Task<IActionResult> GetBudgetProgress()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var currentDate = DateTime.UtcNow;
+            var currentDate = DateTime.Now;
             var startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 

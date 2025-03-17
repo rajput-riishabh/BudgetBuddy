@@ -25,14 +25,12 @@ namespace BudgetBuddy.Controllers
     public class AuthController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly JwtConfig _jwtConfig;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
 
-        public AuthController(AppDbContext context, IOptions<JwtConfig> jwtConfig, IEmailService emailService, IConfiguration configuration)
+        public AuthController(AppDbContext context, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
-            _jwtConfig = jwtConfig.Value;
             _emailService = emailService;
             _configuration = configuration;
         }
@@ -144,6 +142,25 @@ namespace BudgetBuddy.Controllers
             };
 
             _context.Users.Add(user);
+            _context.SaveChanges(); // Save the User first to get the UserId
+
+            // Create a corresponding ApplicationUser
+            var applicationUser = new ApplicationUser
+            {
+                UserId = user.UserId, // Use the UserId generated for the User
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                Email = user.Email,
+                CreatedAt = user.CreatedAt,
+                IsActive = user.IsActive,
+                PasswordHash = user.PasswordHash, // Optionally copy password hash
+                PreferredCurrency = "INR", // Set default value
+                TimeZone = "Asia/Kolkata" // Set default value
+                                          // ProfilePicture will be null by default
+            };
+
+            _context.ApplicationUsers.Add(applicationUser);
             _context.SaveChanges();
 
             // Create a default budget for each category for the new user
@@ -172,150 +189,7 @@ namespace BudgetBuddy.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private string GenerateJwtToken(User user)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.GivenName, user.FirstName),
-                    new Claim(ClaimTypes.Surname, user.LastName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role)
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(_jwtConfig.ExpirationInMinutes),
-                Issuer = _jwtConfig.Issuer,
-                Audience = _jwtConfig.Audience,
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
-
-        [HttpGet]
-        public IActionResult ForgotPassword()
-        {
-            return View(new ForgotPasswordViewModel());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == model.Email && u.IsActive);
-
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToAction(nameof(ForgotPasswordConfirmation));
-            }
-
-            // Generate reset token
-            var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
-
-            // Save reset token
-            var passwordReset = new PasswordReset
-            {
-                UserId = user.UserId,
-                Token = token,
-                ExpiryDate = DateTime.Parse("2025-03-11 14:28:48").AddHours(24),
-                IsUsed = false
-            };
-
-            _context.PasswordResets.Add(passwordReset);
-            await _context.SaveChangesAsync();
-
-            // Generate reset link
-            var resetLink = Url.Action(
-                "ResetPassword",
-                "Auth",
-                new { email = model.Email, token },
-                protocol: Request.Scheme);
-
-            // Send email
-            await _emailService.SendPasswordResetEmailAsync(model.Email, resetLink);
-
-            return RedirectToAction(nameof(ForgotPasswordConfirmation));
-        }
-
-        [HttpGet]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        public IActionResult ResetPassword(string email, string token)
-        {
-            var model = new ResetPasswordViewModel
-            {
-                Email = email,
-                Token = token
-            };
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == model.Email && u.IsActive);
-
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
-            }
-
-            var passwordReset = await _context.PasswordResets
-                .FirstOrDefaultAsync(r =>
-                    r.UserId == user.UserId &&
-                    r.Token == model.Token &&
-                    r.ExpiryDate > DateTime.Parse("2025-03-11 14:28:48") &&
-                    !r.IsUsed);
-
-            if (passwordReset == null)
-            {
-                ModelState.AddModelError("", "Invalid or expired password reset token.");
-                return View(model);
-            }
-
-            // Update password
-            user.PasswordHash = HashPassword(model.Password);
-
-            // Mark token as used
-            passwordReset.IsUsed = true;
-
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(ResetPasswordConfirmation));
-        }
-
-        [HttpGet]
-        public IActionResult ResetPasswordConfirmation()
-        {
-            return View();
-        }
-
+       
         private string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())

@@ -23,7 +23,7 @@ namespace BudgetBuddy.Models.ViewModels
         {
             CategoryExpenses = new List<CategoryReportViewModel>();
             DailyExpenses = new List<DailyExpenseViewModel>();
-            EndDate = DateTime.UtcNow;
+            EndDate = DateTime.Now;
             StartDate = EndDate.AddMonths(-1);
         }
     }
@@ -38,7 +38,7 @@ namespace BudgetBuddy.Models.ViewModels
         public ExpenseReportViewModel()
         {
             Items = new List<ExpenseReportItem>();
-            EndDate = DateTime.UtcNow;
+            EndDate = DateTime.Now;
             StartDate = EndDate.AddMonths(-1);
         }
     }
@@ -126,7 +126,7 @@ namespace BudgetBuddy.Models.ViewModels
             MonthlyData = new List<CategoryTrendViewModel>();
             Months = 3; // Default to 3 months
             StartDate = EndDate.AddMonths(-3);
-            EndDate = DateTime.UtcNow;
+            EndDate = DateTime.Now;
         }
     }
 

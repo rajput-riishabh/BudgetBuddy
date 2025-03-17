@@ -2,7 +2,7 @@
 IEnumerable<BudgetBuddy.Models.ViewModels.ExpenseViewModel>
 @{
     ViewData["Title"] = "Expenses";
-    var currentMonth = DateTime.UtcNow.ToString("MMMM yyyy");
+    var currentMonth = DateTime.Now.ToString("MMMM yyyy");
     var monthlyTotal = (decimal)ViewData["MonthlyTotal"];
 }
 

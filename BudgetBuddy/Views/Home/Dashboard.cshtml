@@ -2,7 +2,7 @@
 @model BudgetBuddy.Models.ViewModels.DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
-    var currentDate = DateTime.UtcNow;
+    var currentDate = DateTime.Now;
     var currentMonth = currentDate.ToString("MMMM yyyy"); 
 }
 
@@ -69,7 +69,7 @@
             <div class="card bg-white shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Monthly Expense Trend</h5>
-                    <canvas id="monthlyTrendChart" height="300"></canvas>
+                    <canvas id="monthlyTrendChart" height="200"></canvas>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
             <div class="card bg-white shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Expense Distribution</h5>
-                    <canvas id="categoryDistributionChart" height="300"></canvas>
+                    <canvas id="categoryDistributionChart" height="200"></canvas>
                 </div>
             </div>
         </div>

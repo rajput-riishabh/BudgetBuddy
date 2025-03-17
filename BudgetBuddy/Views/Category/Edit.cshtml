@@ -2,8 +2,8 @@
 @{
     ViewData["Title"] = "Edit Category";
     var isAdmin = User.IsInRole("Admin");
-    var currentUser = "rajput-riishabh";
-    var currentDate = DateTime.Parse("2025-03-11 12:16:42");
+    var currentUser = User.Identity.Name;
+    var currentDate = DateTime.Now;
 }
 
 <div class="container-fluid">

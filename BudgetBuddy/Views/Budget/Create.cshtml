@@ -1,7 +1,7 @@
 ﻿@model BudgetBuddy.Models.ViewModels.BudgetViewModel
 @{
     ViewData["Title"] = "Set Budget";
-    var today = DateTime.Parse("2025-03-11");
+    var today = DateTime.Now;
     var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
     var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 }
@@ -113,7 +113,7 @@
             // Handle period type selection
             $('input[name="periodType"]').change(function() {
                 const selectedValue = $(this).val();
-                const today = new Date('2025-03-11');
+                const today = new Date();
 
                 if (selectedValue === 'current') {
                     dateRangeFields.hide();

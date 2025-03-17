@@ -34,7 +34,7 @@ namespace BudgetBuddy.Controllers
         public async Task<IActionResult> Dashboard()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var currentDate = DateTime.UtcNow;
+            var currentDate = DateTime.Now;
             var startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 

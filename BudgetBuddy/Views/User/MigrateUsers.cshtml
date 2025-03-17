@@ -1,0 +1,55 @@
+﻿@* Views/User/MigrateUsers.cshtml *@
+@{
+    ViewData["Title"] = "Migrate Users";
+}
+
+<div class="container">
+    <h2>Migrate Users to ApplicationUsers</h2>
+
+    <div class="alert alert-warning">
+        <strong>Warning!</strong> This operation will copy data from the Users table to the ApplicationUsers table.
+        Make sure you have backed up your database before proceeding.
+    </div>
+
+    <div id="migrationResult" style="display:none;" class="alert">
+        <pre id="migrationDetails"></pre>
+    </div>
+
+    <button id="startMigration" class="btn btn-primary">Start Migration</button>
+    <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Cancel</a>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('startMigration').addEventListener('click', async function() {
+            try {
+                this.disabled = true;
+                this.textContent = 'Migrating...';
+
+                const response = await fetch('@Url.Action("MigrateUsers")', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                });
+
+                const result = await response.json();
+
+                const resultDiv = document.getElementById('migrationResult');
+                const detailsPre = document.getElementById('migrationDetails');
+
+                resultDiv.className = 'alert ' + (result.success ? 'alert-success' : 'alert-danger');
+                detailsPre.textContent = JSON.stringify(result, null, 2);
+                resultDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                const resultDiv = document.getElementById('migrationResult');
+                resultDiv.className = 'alert alert-danger';
+                resultDiv.style.display = 'block';
+                document.getElementById('migrationDetails').textContent = 'Error during migration: ' + error.message;
+            } finally {
+                this.textContent = 'Migration Completed';
+            }
+        });
+    </script>
+}

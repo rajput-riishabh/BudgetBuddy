@@ -17,7 +17,7 @@ namespace BudgetBuddy.Models
 
         public bool IsUsed { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Parse("2025-03-11 14:28:48");
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation Property
         public virtual ApplicationUser User { get; set; }

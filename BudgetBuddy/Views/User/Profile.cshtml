@@ -1,0 +1,86 @@
+﻿@model BudgetBuddy.Models.ViewModels.UserProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Your Profile</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success custom-alert" role="alert">
+            @TempData["Success"]
+        </div>
+    }
+
+    <div class="profile-section">
+        <div class="row">
+            <div class="col-md-4">
+                @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+                {
+                    <img src="@Model.ProfilePicture" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="max-width: 150px; height: auto;">
+                }
+                else
+                {
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px; font-size: 2rem;">
+                        @($"{Model.FirstName?.FirstOrDefault()}{Model.LastName?.FirstOrDefault()}".ToUpper())
+                    </div>
+                }
+            </div>
+            <div class="col-md-8">
+                <h4>Personal Information</h4>
+                <p><strong>Name:</strong> @Model.FirstName @Model.LastName</p>
+                <p><strong>Email:</strong> @Model.Email</p>
+                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                {
+                    <p><strong>Phone Number:</strong> @Model.PhoneNumber</p>
+                }
+                <p><strong>Preferred Currency:</strong> @Model.PreferredCurrency</p>
+                <p><strong>Time Zone:</strong> @Model.TimeZone</p>
+
+                <h4 class="mt-4">Budget Overview</h4>
+                <p><strong>Total Expenses:</strong> @Model.TotalExpenses</p>
+                <p><strong>Total Budgets Created:</strong> @Model.TotalBudgets</p>
+                <p><strong>Custom Categories Created:</strong> @Model.CustomCategories</p>
+                <p><strong>Current Month Spending:</strong> @Model.CurrentMonthSpending.ToString("C")</p>
+
+                <div class="mt-4">
+                    <a asp-action="ChangePassword" class="btn btn-primary btn-custom">Change Password</a>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div>
+            <h4>Update Profile</h4>
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="FirstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="FirstName" asp-for="FirstName">
+                </div>
+                <div class="mb-3">
+                    <label for="LastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="LastName" asp-for="LastName">
+                </div>
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="Email" asp-for="Email">
+                </div>
+                <div class="mb-3">
+                    <label for="PreferredCurrency" class="form-label">Preferred Currency</label>
+                    <input type="text" class="form-control" id="PreferredCurrency" asp-for="PreferredCurrency">
+                </div>
+                <div class="mb-3">
+                    <label for="TimeZone" class="form-label">Time Zone</label>
+                    <input type="text" class="form-control" id="TimeZone" asp-for="TimeZone">
+                </div>
+                <div class="mb-3">
+                    <label for="profilePicture" class="form-label">Profile Picture</label>
+                    <input type="file" class="form-control" id="profilePicture" name="profilePicture">
+                </div>
+                <button type="submit" class="btn btn-primary btn-custom">Update Profile</button>
+            </form>
+        </div>
+    </div>
+</div>

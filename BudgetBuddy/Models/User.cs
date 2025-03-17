@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BudgetBuddy.Models
 {
@@ -29,12 +30,27 @@ namespace BudgetBuddy.Models
         [Required]
         public string Role { get; set; } = "User";
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? LastLoginAt { get; set; }
+        public bool IsActive { get; set; } = true;
 
         // Navigation properties
         public virtual ICollection<Expense> Expenses { get; set; }
         public virtual ICollection<Budget> Budgets { get; set; }
-        public bool IsActive { get; internal set; }
+
+        // Computed properties
+        [NotMapped]
+        public string FullName => $"{FirstName} {LastName}";
+
+        [NotMapped]
+        public bool IsAdmin => Role.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+
+        public User()
+        {
+            Expenses = new List<Expense>();
+            Budgets = new List<Budget>();
+            CreatedAt = DateTime.Now;
+            IsActive = true;
+        }
     }
 }

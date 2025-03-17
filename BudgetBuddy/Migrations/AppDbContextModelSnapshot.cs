@@ -98,7 +98,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApplicationUser");
+                    b.ToTable("ApplicationUser", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBuddy.Models.Budget", b =>
@@ -135,7 +135,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Budgets");
+                    b.ToTable("Budgets", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBuddy.Models.Category", b =>
@@ -174,7 +174,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
 
                     b.HasData(
                         new
@@ -243,7 +243,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Expenses");
+                    b.ToTable("Expenses", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBuddy.Models.PasswordReset", b =>
@@ -274,7 +274,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PasswordResets");
+                    b.ToTable("PasswordResets", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBuddy.Models.User", b =>
@@ -324,7 +324,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("BudgetBuddy.Models.Budget", b =>

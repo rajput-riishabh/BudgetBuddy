@@ -58,7 +58,7 @@ namespace BudgetBuddy.Controllers
             var paginatedExpenses = await PaginatedList<Expense>.CreateAsync(expenses, pageNumber ?? 1, pageSize);
 
             // Get monthly total
-            var currentMonth = DateTime.UtcNow;
+            var currentMonth = DateTime.Now;
             var monthStart = new DateTime(currentMonth.Year, currentMonth.Month, 1);
             var monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
@@ -76,7 +76,7 @@ namespace BudgetBuddy.Controllers
             var categories = await _context.Categories.ToListAsync();
             var viewModel = new ExpenseViewModel
             {
-                Date = DateTime.UtcNow,
+                Date = DateTime.Now,
                 Categories = categories
                     .Select(c => new CategoryViewModel
                     {
@@ -268,7 +268,7 @@ namespace BudgetBuddy.Controllers
         public async Task<IActionResult> GetMonthlyExpenses()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-5).Date;
+            var sixMonthsAgo = DateTime.Now.AddMonths(-5).Date;
 
             var monthlyExpenses = await _context.Expenses
                 .Where(e => e.UserId == userId && e.Date >= sixMonthsAgo)

@@ -14,6 +14,7 @@ namespace BudgetBuddy.Models
         public DbSet<Budget> Budgets { get; set; }
 
         public DbSet<PasswordReset> PasswordResets { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

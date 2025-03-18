@@ -18,7 +18,7 @@ namespace BudgetBuddy.Models
 
         // Auditing Properties
         public int CreatedBy { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Parse("2025-03-11 12:41:03");
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
@@ -35,20 +35,20 @@ namespace BudgetBuddy.Models
 
         [NotMapped]
         public decimal CurrentMonthExpenses => Expenses
-            .Where(e => e.Date.Year == DateTime.Parse("2025-03-11 12:41:03").Year &&
-                       e.Date.Month == DateTime.Parse("2025-03-11 12:41:03").Month)
+            .Where(e => e.Date.Year == DateTime.Now.Year &&
+                       e.Date.Month == DateTime.Now.Month)
             .Sum(e => e.Amount);
 
         [NotMapped]
         public decimal CurrentMonthBudget => Budgets
-            .Where(b => b.StartDate <= DateTime.Parse("2025-03-11 12:41:03") &&
-                       b.EndDate >= DateTime.Parse("2025-03-11 12:41:03"))
+            .Where(b => b.StartDate <= DateTime.Now &&
+                       b.EndDate >= DateTime.Now)
             .Sum(b => b.Amount);
 
         [NotMapped]
         public bool HasActiveBudget => Budgets.Any(b =>
-            b.StartDate <= DateTime.Parse("2025-03-11 12:41:03") &&
-            b.EndDate >= DateTime.Parse("2025-03-11 12:41:03"));
+            b.StartDate <= DateTime.Now &&
+            b.EndDate >= DateTime.Now);
 
         // Methods
         public bool CanBeModifiedBy(int userId, bool isAdmin)

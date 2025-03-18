@@ -20,6 +20,6 @@ namespace BudgetBuddy.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation Property
-        public virtual ApplicationUser User { get; set; }
+        public virtual User User { get; set; }
     }
 }

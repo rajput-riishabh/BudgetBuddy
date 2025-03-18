@@ -66,6 +66,12 @@ namespace BudgetBuddy.Controllers
                 return View(model);
             }
 
+            if (!user.IsActive)
+            {
+                ModelState.AddModelError("", "Your Account is deactivated, Please Contact the Website Owner.");
+                return View(model);
+            }
+
             // 1. Create Claims for the authenticated user (similar to what you did for JWT)
             var claims = new List<Claim>
             {
@@ -138,29 +144,13 @@ namespace BudgetBuddy.Controllers
                 Email = model.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
                 Role = "User",
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Users.Add(user);
-            _context.SaveChanges(); // Save the User first to get the UserId
-
-            // Create a corresponding ApplicationUser
-            var applicationUser = new ApplicationUser
-            {
-                UserId = user.UserId, // Use the UserId generated for the User
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName,
-                Email = user.Email,
-                CreatedAt = user.CreatedAt,
-                IsActive = user.IsActive,
-                PasswordHash = user.PasswordHash, // Optionally copy password hash
+                CreatedAt = DateTime.UtcNow,
                 PreferredCurrency = "INR", // Set default value
                 TimeZone = "Asia/Kolkata" // Set default value
                                           // ProfilePicture will be null by default
             };
 
-            _context.ApplicationUsers.Add(applicationUser);
+            _context.Users.Add(user);
             _context.SaveChanges();
 
             // Create a default budget for each category for the new user

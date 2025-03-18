@@ -34,13 +34,13 @@ namespace BudgetBuddy.Controllers
         [Authorize(Roles = "Admin", AuthenticationSchemes = "BudgetBuddyAuth")]
         public async Task<IActionResult> Index()
         {
-            var users = await _context.ApplicationUsers
+            var users = await _context.Users
                 .Select(u => new UserManagementViewModel
                 {
                     Id = u.UserId,
                     FullName = u.FullName,
                     Email = u.Email,
-                    Role = "User", // Assuming a default role, adjust if needed
+                    Role = u.Role,
                     CreatedAt = u.CreatedAt,
                     LastLoginAt = u.LastLoginAt,
                     IsActive = u.IsActive,
@@ -61,7 +61,7 @@ namespace BudgetBuddy.Controllers
                 return Unauthorized(); // Or RedirectToAction("Login", "Auth");
             }
 
-            var applicationUser = await _context.ApplicationUsers
+            var applicationUser = await _context.Users
                 .Include(u => u.Expenses)
                 .Include(u => u.Budgets)
                 .Include(u => u.CreatedCategories)
@@ -102,7 +102,7 @@ namespace BudgetBuddy.Controllers
                     return Unauthorized(); // Or RedirectToAction("Login", "Auth");
                 }
 
-                var applicationUser = await _context.ApplicationUsers.FindAsync(userId);
+                var applicationUser = await _context.Users.FindAsync(userId);
                 if (applicationUser == null)
                 {
                     return NotFound();
@@ -126,7 +126,7 @@ namespace BudgetBuddy.Controllers
                     applicationUser.ProfilePicture = $"/uploads/profiles/{fileName}";
                 }
 
-                _context.ApplicationUsers.Update(applicationUser);
+                _context.Users.Update(applicationUser);
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Profile updated successfully!";
@@ -153,7 +153,7 @@ namespace BudgetBuddy.Controllers
                     return Unauthorized();
                 }
 
-                var applicationUser = await _context.ApplicationUsers.FindAsync(userId);
+                var applicationUser = await _context.Users.FindAsync(userId);
                 if (applicationUser == null)
                 {
                     return NotFound();
@@ -169,7 +169,7 @@ namespace BudgetBuddy.Controllers
                 // Hash the new password
                 applicationUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
 
-                _context.ApplicationUsers.Update(applicationUser);
+                _context.Users.Update(applicationUser);
                 await _context.SaveChangesAsync();
 
                 TempData["Success"] = "Password changed successfully!";
@@ -182,34 +182,17 @@ namespace BudgetBuddy.Controllers
         [Authorize(Roles = "Admin", AuthenticationSchemes = "BudgetBuddyAuth")]
         public async Task<IActionResult> ToggleStatus(int id)
         {
-            var user = await _context.ApplicationUsers.FindAsync(id);
+            var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
             user.IsActive = !user.IsActive;
-            _context.ApplicationUsers.Update(user);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = $"User status updated successfully!";
-            return RedirectToAction(nameof(Index));
-        }
-
-        [Authorize(Roles = "Admin", AuthenticationSchemes = "BudgetBuddyAuth")]
-        public async Task<IActionResult> ChangeRole(int id, string role)
-        {
-            var user = await _context.Users.FindAsync(id); // Find the user in the User table
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            user.Role = role;
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"User role updated successfully!";
+            TempData["Success"] = $"User status updated successfully!";
             return RedirectToAction(nameof(Index));
         }
     }

@@ -108,8 +108,6 @@ namespace BudgetBuddy.Controllers
             CategoryName = summary.CategoryName,
             BudgetAmount = summary.BudgetAmount,
             SpentAmount = summary.SpentAmount,
-            // RemainingAmount is calculated property in BudgetStatusInfo, no need to set here
-            // IsExceeded is calculated property in BudgetStatusInfo, no need to set here
             Status = (Models.BudgetStatus)(summary.IsExceeded ? BudgetBuddy.Models.Enums.BudgetStatus.OverBudget : BudgetBuddy.Models.Enums.BudgetStatus.UnderBudget)
         });
 

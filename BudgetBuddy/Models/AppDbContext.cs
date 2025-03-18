@@ -14,7 +14,6 @@ namespace BudgetBuddy.Models
         public DbSet<Budget> Budgets { get; set; }
 
         public DbSet<PasswordReset> PasswordResets { get; set; }
-        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +42,12 @@ namespace BudgetBuddy.Models
                 .HasOne(b => b.Category)
                 .WithMany(c => c.Budgets)
                 .HasForeignKey(b => b.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Category>()
+                .HasOne<User>()
+                .WithMany(u => u.CreatedCategories)
+                .HasForeignKey(c => c.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Seed default categories

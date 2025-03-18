@@ -144,8 +144,8 @@ IEnumerable<BudgetBuddy.Models.ViewModels.ExpenseViewModel>
 
             <!-- Pagination -->
             @{
-                var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                    var prevDisabled = !Model.HasPreviousPage ? "enabled" : "disabled";
+                    var nextDisabled = !Model.HasNextPage ? "enabled" : "disabled";
             }
 
             <div class="d-flex justify-content-between align-items-center mt-3">

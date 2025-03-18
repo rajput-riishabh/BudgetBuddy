@@ -1,4 +1,5 @@
-﻿@model IEnumerable<BudgetBuddy.Models.ViewModels.UserManagementViewModel>
+﻿@using System.Security.Claims;
+@model IEnumerable<BudgetBuddy.Models.ViewModels.UserManagementViewModel>
 @{
     ViewData["Title"] = "User Management";
 }
@@ -25,33 +26,25 @@
                             Created At: @user.CreatedAt.ToShortDateString() <br />
                             Last Login: @(user.LastLoginAt?.ToShortDateString() ?? "Never") <br />
                             Role: @user.Role <br />
-                            Expenses: @user.ExpenseCount (Total: @user.TotalExpenses.ToString("C"))
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
+
                             <div>
-                                @if (user.IsActive)
+                                @if (user.Role.ToLower() != "admin")
                                 {
-                                    <form asp-action="ToggleStatus" asp-route-id="@user.Id" method="post">
-                                        <button type="submit" class="btn btn-sm btn-danger btn-custom">Deactivate</button>
-                                    </form>
+                                    @if (user.IsActive)
+                                    {
+                                        <form asp-action="ToggleStatus" asp-route-id="@user.Id" method="post">
+                                            <button type="submit" class="btn btn-sm btn-danger btn-custom">Deactivate</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="ToggleStatus" asp-route-id="@user.Id" method="post">
+                                            <button type="submit" class="btn btn-sm btn-success btn-custom">Activate</button>
+                                        </form>
+                                    }
                                 }
-                                else
-                                {
-                                    <form asp-action="ToggleStatus" asp-route-id="@user.Id" method="post">
-                                        <button type="submit" class="btn btn-sm btn-success btn-custom">Activate</button>
-                                    </form>
-                                }
-                            </div>
-                            <div>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-secondary btn-custom dropdown-toggle" type="button" id="dropdownRoleMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Change Role
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownRoleMenu">
-                                        <li><a class="dropdown-item" asp-action="ChangeRole" asp-route-id="@user.Id" asp-route-role="Admin">Admin</a></li>
-                                        <li><a class="dropdown-item" asp-action="ChangeRole" asp-route-id="@user.Id" asp-route-role="User">User</a></li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                     </div>

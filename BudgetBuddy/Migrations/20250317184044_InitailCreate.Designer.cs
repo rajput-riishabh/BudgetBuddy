@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BudgetBuddy.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250312144454_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250317184044_InitailCreate")]
+    partial class InitailCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,29 +27,24 @@ namespace BudgetBuddy.Migrations
 
             modelBuilder.Entity("BudgetBuddy.Models.ApplicationUser", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -58,48 +53,31 @@ namespace BudgetBuddy.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
 
                     b.Property<string>("PreferredCurrency")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("TimeZone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("ApplicationUser");
                 });
@@ -115,7 +93,7 @@ namespace BudgetBuddy.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("ApplicationUserId")
+                    b.Property<int?>("ApplicationUserUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("CategoryId")
@@ -132,7 +110,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasKey("BudgetId");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("ApplicationUserUserId");
 
                     b.HasIndex("CategoryId");
 
@@ -149,7 +127,7 @@ namespace BudgetBuddy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
-                    b.Property<int?>("ApplicationUserId")
+                    b.Property<int?>("ApplicationUserUserId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -175,7 +153,9 @@ namespace BudgetBuddy.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("ApplicationUserUserId");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("Categories");
 
@@ -221,7 +201,7 @@ namespace BudgetBuddy.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("ApplicationUserId")
+                    b.Property<int?>("ApplicationUserUserId")
                         .HasColumnType("int");
 
                     b.Property<int>("CategoryId")
@@ -240,7 +220,7 @@ namespace BudgetBuddy.Migrations
 
                     b.HasKey("ExpenseId");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("ApplicationUserUserId");
 
                     b.HasIndex("CategoryId");
 
@@ -316,7 +296,18 @@ namespace BudgetBuddy.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PreferredCurrency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProfilePicture")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -334,7 +325,7 @@ namespace BudgetBuddy.Migrations
                 {
                     b.HasOne("BudgetBuddy.Models.ApplicationUser", null)
                         .WithMany("Budgets")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("ApplicationUserUserId");
 
                     b.HasOne("BudgetBuddy.Models.Category", "Category")
                         .WithMany("Budgets")
@@ -357,14 +348,20 @@ namespace BudgetBuddy.Migrations
                 {
                     b.HasOne("BudgetBuddy.Models.ApplicationUser", null)
                         .WithMany("CreatedCategories")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("ApplicationUserUserId");
+
+                    b.HasOne("BudgetBuddy.Models.User", null)
+                        .WithMany("CreatedCategories")
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BudgetBuddy.Models.Expense", b =>
                 {
                     b.HasOne("BudgetBuddy.Models.ApplicationUser", null)
                         .WithMany("Expenses")
-                        .HasForeignKey("ApplicationUserId");
+                        .HasForeignKey("ApplicationUserUserId");
 
                     b.HasOne("BudgetBuddy.Models.Category", "Category")
                         .WithMany("Expenses")
@@ -413,6 +410,8 @@ namespace BudgetBuddy.Migrations
             modelBuilder.Entity("BudgetBuddy.Models.User", b =>
                 {
                     b.Navigation("Budgets");
+
+                    b.Navigation("CreatedCategories");
 
                     b.Navigation("Expenses");
                 });

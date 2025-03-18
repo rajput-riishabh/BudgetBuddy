@@ -20,10 +20,6 @@ namespace BudgetBuddy.Models.ViewModels
         [EmailAddress]
         public string Email { get; set; }
 
-        [Phone]
-        [Display(Name = "Phone Number")]
-        public string PhoneNumber { get; set; }
-
         public string ProfilePicture { get; set; }
 
         [Display(Name = "Preferred Currency")]

@@ -31,7 +31,7 @@ namespace BudgetBuddy.Models
 
         // Helper Properties
         [NotMapped]
-        public bool IsPredefined => CategoryId >= 1 && CategoryId <= 4;
+        public bool IsPredefined => (CategoryId >= 1 && CategoryId <= 4) && CreatedBy == 0;
 
         [NotMapped]
         public decimal CurrentMonthExpenses => Expenses

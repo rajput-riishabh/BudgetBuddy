@@ -23,9 +23,13 @@
                                 {
                                     <span class="badge bg-success me-2">Custom Category</span>
                                 }
-                                @if (isAdmin)
+                                @if (isAdmin && Model.IsPredefined)
                                 {
                                     <span>Editing as Administrator</span>
+                                }
+                                else if (isAdmin && !Model.IsPredefined)
+                                {
+                                    <span>Editing as @currentUser</span>
                                 }
                                 else
                                 {

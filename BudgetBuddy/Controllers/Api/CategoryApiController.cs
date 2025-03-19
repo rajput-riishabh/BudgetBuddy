@@ -30,7 +30,7 @@ namespace BudgetBuddy.Controllers.Api
         public async Task<IActionResult> GetStatistics()
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var currentDate = DateTime.Parse("2025-03-11 12:20:30");
+            var currentDate = DateTime.Now;
             var startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
@@ -121,7 +121,7 @@ namespace BudgetBuddy.Controllers.Api
         public async Task<IActionResult> GetMonthlyTrends([FromQuery] int months = 6)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var currentDate = DateTime.Parse("2025-03-11 12:20:30");
+            var currentDate = DateTime.Now;
             var startDate = currentDate.AddMonths(-months + 1).Date;
 
             var trends = await _context.Expenses
@@ -173,7 +173,7 @@ namespace BudgetBuddy.Controllers.Api
             }
 
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var currentDate = DateTime.Parse("2025-03-11 12:20:30");
+            var currentDate = DateTime.Now;
 
             foreach (var update in updates)
             {

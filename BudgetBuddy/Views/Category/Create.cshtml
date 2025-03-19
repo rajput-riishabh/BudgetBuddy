@@ -39,15 +39,13 @@
                             <div class="mb-4">
                                 <label class="form-label">Category Type</label>
                                 <div class="btn-group w-100" role="group">
-                                    <input type="radio" class="btn-check" name="categoryType" id="customCategory"
-                                           value="custom" checked asp-for="IsPredefined">
-                                    <label class="btn btn-outline-primary" for="customCategory">
+                                    <input type="radio" class="btn-check"  id="customCategory"
+                                           value="false" checked asp-for="IsPredefined"> <label class="btn btn-outline-primary" for="customCategory">
                                         <i class="bi bi-person"></i> Custom Category
                                     </label>
 
-                                    <input type="radio" class="btn-check" name="categoryType" id="systemCategory"
-                                           value="system" asp-for="IsPredefined">
-                                    <label class="btn btn-outline-info" for="systemCategory">
+                                    <input type="radio" class="btn-check"  id="systemCategory"
+                                           value="true" asp-for="IsPredefined"> <label class="btn btn-outline-info" for="systemCategory">
                                         <i class="bi bi-gear"></i> System Category
                                     </label>
                                 </div>
@@ -57,7 +55,6 @@
                                 </div>
                             </div>
                         }
-
                         <!-- Category Name -->
                         <div class="mb-4">
                             <label asp-for="Name" class="form-label required">Category Name</label>

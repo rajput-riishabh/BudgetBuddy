@@ -1,0 +1,12 @@
+" Product Backlog"                              Accomodation Search System
+
+User Story Id,User Story Name,User Story Role,User Story Details,Acceptance criteria,Sprint,Story Point,Done,Added in Sprint,Closed in sprint,Actual Story Points,
+US001,User Registration,As a new user,I want to register with my email and create a account,"Registration form with username/password fields, Password encryption, Basic profile creation, User role selection",1,5,Yes,1,1,5,
+US002,User Authentication,As a registered user,I want to log in securely,"Cookie-based authentication, Secure session management, Proper error handling",1,5,Yes,1,1,5,
+US003,Profile Management,As a user,I want to manage my profile information,"Edit personal details, Change password",1,8,Yes,1,1,8,
+US004,Create Property Listing,As a property lister,I want to create new property listings,"Add property details and description,Upload multiple images,Set pricing and availability,Add amenities",1,5,Yes,1,1,5,
+US005,Edit/Update Listing,As a property lister,I want to update my listings,"Modify property details,Update images, Change pricing, Update availability",2,8,Yes,2,2,8,
+US006,Listing Approval,As an admin,I want to review and approve Listings,"Review new listings, Approve/reject listings, Notify listers of decisions",2,13,Yes,2,2,13,
+US007,Search with Filters,As a seeker,I want to search for properties with various filters,"Search by location,price and property type, Sort results",2,13,Yes,2,2,13,
+US008,Booking Management,As a seeker,I want to schedule property visits,"Request to visit, Updated visit status from lister",3,8,Yes,3,3,8,
+US009,User Management,As a admin,I want to manage users,"View all users, block users, Manage roles",3,8,Yes,3,3,8,
